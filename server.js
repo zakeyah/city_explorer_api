@@ -22,11 +22,15 @@ const handelWeather= (req,res)=>{
   res.json(Weather.all);
 };
 
+const handelError = (req,res)=>{
+  res.status(500).send('Error');
+};
 
 
 
 
-function Location(info) {
+
+function Location( info) {
   this.search_query = info.display_name.split(',')[0];
   this.formatted_query =info.display_name;
   this.latitude = info.lat;
@@ -49,6 +53,7 @@ const handleRequest = (request, response) => {
 
 app.get('/location',handelLocation);
 app.get('/weather',handelWeather);
+app.use('*', handelError);
 app.get('/', handleRequest);
 
 app.listen(PORT, () => {
