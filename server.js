@@ -1,18 +1,29 @@
 'use strict';
 const express = require('express');
-const cosr = require('cors');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-app.use(cosr());
+const PORT = process.env.PORT || 3001;
+app.use(cors());
+
 
 const handelLocation = (request,response)=>{
   const locationFolder =require('./data/location.json');
   const locationInfo = new Location (locationFolder[0]);
   response.json(locationInfo);
 };
-app.get('/location',handelLocation);
+
+const handelWeather= (req,res)=>{
+  const weather = require('./data/weather.json');
+  weather.data.forEach(day => {
+    let weatherInfo = new Weather(day);
+  });
+  res.json(Weather.all);
+};
+
+
+
 
 
 function Location(info) {
@@ -22,8 +33,12 @@ function Location(info) {
   this.longitude = info.lon;
 }
 
-
-
+function Weather (info){
+  this.forecast = info.weather.description;
+  this.time = new Date(info.valid_date).toDateString();
+  Weather.all.push(this);
+}
+Weather.all=[];
 
 
 
@@ -32,6 +47,8 @@ const handleRequest = (request, response) => {
   response.send('its work');
 };
 
+app.get('/location',handelLocation);
+app.get('/weather',handelWeather);
 app.get('/', handleRequest);
 
 app.listen(PORT, () => {
