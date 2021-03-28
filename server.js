@@ -53,8 +53,8 @@ const handleRequest = (request, response) => {
 
 app.get('/location',handelLocation);
 app.get('/weather',handelWeather);
-app.use('*', handelError);
 app.get('/', handleRequest);
+app.use('*', handelError);
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
