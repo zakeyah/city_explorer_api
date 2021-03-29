@@ -13,10 +13,9 @@ const handelLocation = (request,response)=>{
   const locationInfo = new Location (locationFolder[0]);
   response.json(locationInfo);
 };
-
 const handelWeather= (req,res)=>{
   const weather = require('./data/weather.json');
-  weather.data.forEach(day => {
+  weather.data.map(day => {
     let weatherInfo = new Weather(day);
   });
   res.json(Weather.all);
@@ -43,6 +42,8 @@ function Weather (info){
   Weather.all.push(this);
 }
 Weather.all=[];
+
+
 
 
 
