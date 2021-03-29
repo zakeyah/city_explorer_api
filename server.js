@@ -1,6 +1,8 @@
 'use strict';
 const express = require('express');
 const cors = require('cors');
+const superagent = require('superagent');
+const locations = {};
 require('dotenv').config();
 
 const app = express();
@@ -9,9 +11,28 @@ app.use(cors());
 
 
 const handelLocation = (request,response)=>{
-  const locationFolder =require('./data/location.json');
-  const locationInfo = new Location (locationFolder[0]);
-  response.json(locationInfo);
+  
+  const city = request.query.city;
+  let key = process.env.GEOCODE_API_KEY;
+  const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json&limit=1`;
+
+  if(locations[url]){
+    response.json(locations[url]);
+  }else{
+    superagent.get(url)
+      .then(data=>{
+        const geoData =data.body[0];
+        const locationInfo = new Location (city,geoData);
+        locations[url]=locationInfo;
+        response.json(locationInfo);
+      })
+
+      .catch((error) => {
+        console.log('ERROR', error);
+        response.status(500).send('So sorry, something went wrong.');
+      });
+  }
+
 };
 const handelWeather= (req,res)=>{
   const weather = require('./data/weather.json');
@@ -21,6 +42,7 @@ const handelWeather= (req,res)=>{
   res.json(Weather.all);
 };
 
+
 const handelError = (req,res)=>{
   res.status(500).send('Error');
 };
@@ -29,8 +51,8 @@ const handelError = (req,res)=>{
 
 
 
-function Location( info) {
-  this.search_query = info.display_name.split(',')[0];
+function Location( city,info) {
+  this.search_query = city;
   this.formatted_query =info.display_name;
   this.latitude = info.lat;
   this.longitude = info.lon;
@@ -56,6 +78,10 @@ app.get('/location',handelLocation);
 app.get('/weather',handelWeather);
 app.get('/', handleRequest);
 app.use('*', handelError);
+
+function errorHandler(error, req, res) {
+  res.status(500).send(error);
+}
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
