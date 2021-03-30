@@ -42,9 +42,27 @@ const handelWeather = (req, res) => {
     .then(weatherInfo => {
       const geoData = weatherInfo.body;
       geoData.data.map(day => {
-        return new Weather(day);
+        let newWeather = new Weather(day);
       });
       res.json(Weather.all);
+    })
+    .catch((error) => {
+
+      res.status(500).send('So sorry, something went wrong.');
+    });
+};
+
+const handelPark = (req, res) => {
+  let key = process.env.PARKS_API_KEY;
+  const url = `https://developer.nps.gov/api/v1/parks?key=${key}`;
+  superagent.get(url)
+    .then(Info => {
+      const geoData = Info;
+      console.log('hi');
+      geoData.data.map(data => {
+        let newPark = new park(data);
+      });
+      res.json(Park.all);
     })
     .catch((error) => {
 
@@ -75,7 +93,16 @@ function Weather(info) {
 }
 Weather.all = [];
 
+function Park(info) {
+  this.name = info.fullName;
+  this.address = `${info.addresses[0].line1}, ${info.addresses[0].city}, ${info.addresses[0].stateCode} ${info.addresses[0].postalCode}`;
+  this.fee = info.entranceFees[0].cost ;
+  this.description = info.description;
+  this.url = info.url;
+  Park.all.push(this);
+}
 
+Park.all=[];
 
 
 
@@ -87,6 +114,7 @@ const handleRequest = (request, response) => {
 app.get('/location', handelLocation);
 app.get('/weather', handelWeather);
 app.get('/', handleRequest);
+app.get('/park',handelPark);
 app.use('*', handelError);
 
 
