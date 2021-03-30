@@ -11,27 +11,28 @@ app.use(cors());
 
 
 const handelLocation = (request, response) => {
-
   const city = request.query.city;
   let key = process.env.GEOCODE_API_KEY;
   const url = `https://us1.locationiq.com/v1/search.php?key=${key}&q=${city}&format=json&limit=1`;
-
-  if (locations[url]) {
-    response.json(locations[url]);
-  } else {
-    superagent.get(url)
-      .then(data => {
-        const geoData = data.body[0];
-        const locationInfo = new Location(city, geoData);
-        locations[url] = locationInfo;
-        response.json(locationInfo);
-      })
+  
+  superagent.get(url)
+  .then(data => {
+    const geoData = data.body[0];
+    const locationInfo = new Location(city, geoData);
+    let SQL = 'INSERT INTO people (search_query, formatted_query,latitude,longitude) VALUES ($1, $2,$3,$4) RETURNING *';
+    let safeValues = [search_query, formatted_query,latitude,longitude];
+    client.query(SQL, safeValues)
+    .then( results => {
+      response.status(200).json(results);
+       
+        
+    })
 
       .catch((error) => {
 
         response.status(500).send('So sorry, something went wrong.');
       });
-  }
+  
 
 };
 const handelWeather = (req, res) => {
