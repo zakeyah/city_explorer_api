@@ -63,6 +63,7 @@ const handelWeather = (req, res) => {
   const url = `https://api.weatherbit.io/v2.0/forecast/daily?q=${city}&key=${key}`;
   superagent.get(url)
     .then(weatherInfo => {
+      console.log(weatherInfo)
       const geoData = weatherInfo.body;
       geoData.data.map(day => {
         return new Weather(day);
@@ -94,6 +95,11 @@ const handelPark = (req, res) => {
       res.status(500).send('So sorry, something went wrong.');
     });
 };
+
+const handelMovies=(req,res)=>{
+  let key =process.env.MOVIE_API_KEY;
+  const url =
+}
 
 
 const handelError = (req, res) => {
@@ -129,6 +135,16 @@ function Park(info) {
 
 Park.all = [];
 
+function Movies(info){
+  this.titel=
+  this.overview=
+  this.average_votes=
+  this.total_votes=
+  this.image_url=
+  this.popularity=
+  this.released=
+}
+
 const handleRequest = (request, response) => {
   console.log(request.query);
   response.send('its work');
@@ -140,6 +156,7 @@ app.get('/location', handelLocation);
 app.get('/weather', handelWeather);
 app.get('/', handleRequest);
 app.get('/park', handelPark);
+app.get('/movies', handelMovies);
 app.use('*', handelError);
 
 
