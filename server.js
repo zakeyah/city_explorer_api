@@ -67,10 +67,8 @@ const handelWeather = (req, res) => {
   const city = req.query.search_query;
   let key = process.env.WEATHER_API_KEY;
   const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&key=${key}`;
-  console.log('oooooo', city);
   superagent.get(url)
     .then(weatherInfo => {
-      console.log('wwwwwwww', city);
       const geoData = weatherInfo.body;
       geoData.data.map(day => {
         return new Weather(day);
@@ -104,7 +102,7 @@ const handelPark = (req, res) => {
 
 const handelMovies = (req, res) => {
   let key = process.env.MOVIE_API_KEY;
-  let city = req.query.query;
+  let city = req.query.search_query;
   const url = `https://api.themoviedb.org/3/search/movie?api_key=${key}&query=${city}`;
 
 
@@ -126,7 +124,7 @@ const handelMovies = (req, res) => {
 };
 
 const handelyelp = (req, res) => {
-  let city = req.query.city;
+  let city = req.query.search_query;
   const key = process.env.YELP_API_KEY;
   const url = `https://api.yelp.com/v3/businesses/search?location=${city}`;
 
